@@ -122,6 +122,7 @@ async function displayAlbums() {
                     
                     cardContainer.innerHTML = cardContainer.innerHTML + `<div data-folder="${folder}" class="card md:w-52 p-3 rounded-md bg-neutral-800 *:pt-1 relative hover:bg-slate-600 transition-all duration-700 group">
             <img class="w-fit h-48 rounded-lg" src="/songs/${folder}/cover.jpeg" alt="img">
+            
             <div
               class="play flex absolute ml-[15.5rem] -mt-14 md:ml-[9.3rem] md:-mt-11 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
               <button class="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full">
