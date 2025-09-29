@@ -1,6 +1,7 @@
 let currentSong = new Audio();
 let songs;
 let currFolder;
+let play;
 
 function convertSecondsToTimeFormat(seconds) {
     if (isNaN(seconds) || seconds < 0) {
@@ -19,7 +20,7 @@ function convertSecondsToTimeFormat(seconds) {
 async function getSongs(folder) {
     currFolder = folder;
 
-    let response = await fetch(`https://ashwanik0777.github.io/Audify/${folder}/`);
+    let response = await fetch(`http://localhost:5500/${folder}/`);
     
     if (!response.ok) {
         console.error("Error fetching the folder content.");
@@ -84,20 +85,42 @@ const playMusic = (track, pause = false) => {
 
 
 async function displayAlbums() {
-    let a = await fetch(`https://ashwanik0777.github.io/Audify/songs/`)
-    let response = await a.text();
-    let div = document.createElement("div")
-    div.innerHTML = response;
-    let anchors = div.getElementsByTagName("a")
-    let cardContainer = document.querySelector(".card-container")
-    let array=Array.from(anchors)
+    console.log("Starting displayAlbums function...");
+    try {
+        let a = await fetch(`http://localhost:5500/songs/`)
+        if (!a.ok) {
+            throw new Error(`Failed to fetch songs directory: ${a.status}`);
+        }
+        let response = await a.text();
+        console.log("Songs directory response received");
+        
+        let div = document.createElement("div")
+        div.innerHTML = response;
+        let anchors = div.getElementsByTagName("a")
+        let cardContainer = document.querySelector(".card-container")
+        console.log("Card container found:", cardContainer);
+        
+        let array = Array.from(anchors)
+        console.log("Found anchors:", array.length);
+        
         for (let index = 0; index < array.length; index++) {
             const e = array[index];
-        if(e.href.includes("/songs/") && !e.href.includes(".htaccess")){
-           let folder = e.href.split("/").slice(-1)[0]
-           let a = await fetch(`https://ashwanik0777.github.io/Audify/songs/${folder}/info.json`)
-            let response = await a.json();
-            cardContainer.innerHTML = cardContainer.innerHTML + `<div data-folder="${folder}" class="card md:w-52 p-3 rounded-md bg-neutral-800 *:pt-1 relative hover:bg-slate-600 transition-all duration-700 group">
+            console.log("Processing anchor:", e.href);
+            
+            if(e.href.includes("/songs/") && !e.href.includes(".htaccess") && !e.href.endsWith("/songs")){
+                let folder = e.href.split("/").slice(-1)[0]
+                console.log("Processing folder:", folder);
+                
+                try {
+                    let infoResponse = await fetch(`http://localhost:5500/songs/${folder}/info.json`)
+                    if (!infoResponse.ok) {
+                        console.warn(`Failed to fetch info.json for ${folder}: ${infoResponse.status}`);
+                        continue;
+                    }
+                    let info = await infoResponse.json();
+                    console.log("Info loaded for", folder, ":", info);
+                    
+                    cardContainer.innerHTML = cardContainer.innerHTML + `<div data-folder="${folder}" class="card md:w-52 p-3 rounded-md bg-neutral-800 *:pt-1 relative hover:bg-slate-600 transition-all duration-700 group">
             <img class="w-fit h-48 rounded-lg" src="/songs/${folder}/cover.jpeg" alt="img">
             <div
               class="play flex absolute ml-[15.5rem] -mt-14 md:ml-[9.3rem] md:-mt-11 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
@@ -109,10 +132,17 @@ async function displayAlbums() {
                 </svg>
               </button>
             </div>
-            <h1 class="font-light text-lg">${response.title}</h1>
-            <p class="font-light text-sm text-zinc-400">${response.description}</p>
+            <h1 class="font-light text-lg">${info.title}</h1>
+            <p class="font-light text-sm text-zinc-400">${info.description}</p>
           </div>`
+                } catch (error) {
+                    console.error(`Error processing folder ${folder}:`, error);
+                }
+            }
         }
+        console.log("Finished processing all folders");
+    } catch (error) {
+        console.error("Error in displayAlbums:", error);
     }
     
     Array.from(document.getElementsByClassName("card")).forEach(e => { 
@@ -125,10 +155,16 @@ async function displayAlbums() {
 }
 
 async function main() {
+    console.log("Main function started");
+    
+    // Initialize play button
+    play = document.querySelector("#play");
+    
     await getSongs("songs/KK");
     playMusic(songs[0], true)
-
-   await displayAlbums();
+    console.log("About to call displayAlbums");
+    await displayAlbums();
+    console.log("displayAlbums completed");
 
     play.addEventListener("click", () => {
         if (currentSong.paused) {
@@ -224,4 +260,10 @@ async function main() {
     });
     
 }
-main();
+
+console.log("Script loaded, calling main...");
+main().then(() => {
+    console.log("Main function completed successfully");
+}).catch(error => {
+    console.error("Main function failed:", error);
+});
