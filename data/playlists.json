@@ -1,0 +1,76 @@
+{
+  "playlists": [
+    {
+      "id": "focus-flow",
+      "title": "Focus Flow",
+      "description": "Calm background tracks for study and work.",
+      "cover": "/img/playlist.svg",
+      "embedUrl": "",
+      "tracks": [
+        {
+          "title": "Quiet Desk",
+          "artist": "Audify",
+          "audioUrl": ""
+        },
+        {
+          "title": "Soft Signals",
+          "artist": "Audify",
+          "audioUrl": ""
+        },
+        {
+          "title": "Late Notes",
+          "artist": "Audify",
+          "audioUrl": ""
+        }
+      ]
+    },
+    {
+      "id": "night-drive",
+      "title": "Night Drive",
+      "description": "Smooth tracks for late city rides.",
+      "cover": "/img/playlist.svg",
+      "embedUrl": "",
+      "tracks": [
+        {
+          "title": "Neon Lines",
+          "artist": "Audify",
+          "audioUrl": ""
+        },
+        {
+          "title": "After Midnight",
+          "artist": "Audify",
+          "audioUrl": ""
+        },
+        {
+          "title": "Last Exit",
+          "artist": "Audify",
+          "audioUrl": ""
+        }
+      ]
+    },
+    {
+      "id": "bright-mornings",
+      "title": "Bright Mornings",
+      "description": "Easy starts for fresh mornings.",
+      "cover": "/img/playlist.svg",
+      "embedUrl": "",
+      "tracks": [
+        {
+          "title": "First Light",
+          "artist": "Audify",
+          "audioUrl": ""
+        },
+        {
+          "title": "Breezy Streets",
+          "artist": "Audify",
+          "audioUrl": ""
+        },
+        {
+          "title": "Open Window",
+          "artist": "Audify",
+          "audioUrl": ""
+        }
+      ]
+    }
+  ]
+}

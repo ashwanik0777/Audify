@@ -123,6 +123,13 @@
       </div>
     </div>
   </div>
+  <div id="embed-modal" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 50;">
+    <div style="background: #0f0f0f; width: 90vw; max-width: 900px; border-radius: 8px; padding: 16px; position: relative;">
+      <button id="embed-close" style="position: absolute; top: 8px; right: 12px; color: #ffffff; font-size: 18px;">x</button>
+      <div id="embed-empty" style="color: #a1a1aa; font-size: 14px;">Embed not available for this playlist.</div>
+      <iframe id="embed-frame" style="width: 100%; height: 60vh; margin-top: 12px; display: none;" title="playlist embed" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+  </div>
   <script src="script.js"></script>
 </body>
 
