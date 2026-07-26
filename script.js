@@ -216,61 +216,27 @@ function renderTracks(playlist) {
     songListUl.innerHTML = "";
 
     if (!playlist || !Array.isArray(playlist.tracks) || playlist.tracks.length === 0) {
-        songListUl.innerHTML = "<li class=\"text-sm text-zinc-500 py-6 text-center\">No tracks in this playlist.</li>";
+        songListUl.innerHTML = "<li class=\"text-sm text-zinc-400\">No tracks in this playlist.</li>";
         return;
     }
 
     playlist.tracks.forEach((track, index) => {
         const title = track.title || "Untitled";
         const artist = track.artist || "Unknown";
-        const isActive = state.activeTrackIndex === index;
-        const bgClass = isActive ? "bg-neutral-800 border-green-500/50" : "border-transparent";
-        const titleClass = isActive ? "text-green-400 font-semibold" : "text-zinc-200 font-medium";
-        const iconSrc = isActive ? "/img/play.svg" : "/img/music.svg";
-
         songListUl.insertAdjacentHTML(
             "beforeend",
-            `<li data-index="${index}" class="group flex items-center gap-3 w-full cursor-pointer p-2 rounded-lg hover:bg-neutral-800/80 transition-all duration-200 border hover:border-neutral-700/60 my-1 ${bgClass}">
-                <div class="relative flex items-center justify-center shrink-0 w-9 h-9 bg-neutral-800/90 rounded-md group-hover:bg-green-600/20 transition-colors">
-                    <img class="song-icon w-4 h-4 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all" src="${iconSrc}" alt="icon">
+            `<li data-index="${index}" class="flex gap-2 w-auto md:w-80 -ml-3 cursor-pointer items-center p-2.5 justify-between border-[1px] border-white rounded-md my-3">
+                <img class="h-6" src="/img/music.svg" alt="music">
+                <div class="info w-52 md:w-40">
+                    <div>${title}</div>
+                    <div>${artist}</div>
                 </div>
-                <div class="flex-1 min-w-0 pr-1">
-                    <div class="song-title text-xs sm:text-sm truncate group-hover:text-green-400 transition-colors ${titleClass}" title="${title}">${title}</div>
-                    <div class="text-[11px] text-zinc-400 truncate mt-0.5" title="${artist}">${artist}</div>
-                </div>
-                <div class="shrink-0 flex items-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 pr-1">
-                    <div class="w-7 h-7 rounded-full bg-green-500 flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-all">
-                        <img class="w-3.5 h-3.5 ml-0.5 filter brightness-0 invert" src="/img/play.svg" alt="play">
-                    </div>
+                <div class="playnow flex items-center gap-2">
+                    <span class="text-xs">Play Now</span>
+                    <img class="h-6" src="/img/play.svg" alt="play">
                 </div>
             </li>`
         );
-    });
-}
-
-function highlightActiveTrack() {
-    const allItems = document.querySelectorAll(".songList ul li[data-index]");
-    allItems.forEach(item => {
-        const idx = Number(item.dataset.index);
-        const titleEl = item.querySelector(".song-title");
-        const iconEl = item.querySelector(".song-icon");
-        if (idx === state.activeTrackIndex) {
-            item.classList.add("bg-neutral-800", "border-green-500/50");
-            item.classList.remove("border-transparent");
-            if (titleEl) {
-                titleEl.classList.add("text-green-400", "font-semibold");
-                titleEl.classList.remove("text-zinc-200", "font-medium");
-            }
-            if (iconEl) iconEl.src = "/img/play.svg";
-        } else {
-            item.classList.remove("bg-neutral-800", "border-green-500/50");
-            item.classList.add("border-transparent");
-            if (titleEl) {
-                titleEl.classList.remove("text-green-400", "font-semibold");
-                titleEl.classList.add("text-zinc-200", "font-medium");
-            }
-            if (iconEl) iconEl.src = "/img/music.svg";
-        }
     });
 }
 
@@ -287,7 +253,6 @@ function playTrack(index, pause = false) {
     }
 
     state.activeTrackIndex = index;
-    highlightActiveTrack();
     const title = track.title || "Untitled";
     const artist = track.artist || "Unknown";
     const displayTitle = `${title} - ${artist}`;
