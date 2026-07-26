@@ -1,5 +1,7 @@
 const http = require("http");
 const { URL } = require("url");
+const fs = require("fs");
+const path = require("path");
 require("dotenv").config();
 
 const PORT = process.env.PORT || 4000;
@@ -24,6 +26,74 @@ function sendJson(res, statusCode, payload) {
 
 function sendError(res, statusCode, message) {
   sendJson(res, statusCode, { error: message });
+}
+
+function getLocalPlaylists() {
+  const songsDir = path.join(__dirname, "songs");
+  if (!fs.existsSync(songsDir)) {
+    return [];
+  }
+
+  const folders = fs.readdirSync(songsDir, { withFileTypes: true })
+    .filter(dirent => dirent.isDirectory() && !dirent.name.startsWith("."))
+    .map(dirent => dirent.name);
+
+  const playlists = [];
+
+  for (const folder of folders) {
+    const folderPath = path.join(songsDir, folder);
+    let title = folder;
+    let description = "Local Playlist";
+
+    const infoPath = path.join(folderPath, "info.json");
+    if (fs.existsSync(infoPath)) {
+      try {
+        const infoData = JSON.parse(fs.readFileSync(infoPath, "utf8"));
+        if (infoData.title) title = infoData.title;
+        if (infoData.description) description = infoData.description;
+      } catch (e) {
+        console.error(`Error reading info.json in ${folder}:`, e.message);
+      }
+    }
+
+    let cover = "/img/playlist.svg";
+    const possibleCovers = ["cover.jpeg", "cover.jpg", "cover.png", "cover.webp"];
+    for (const coverName of possibleCovers) {
+      if (fs.existsSync(path.join(folderPath, coverName))) {
+        cover = `/songs/${encodeURIComponent(folder)}/${encodeURIComponent(coverName)}`;
+        break;
+      }
+    }
+
+    const files = fs.readdirSync(folderPath);
+    const audioExtensions = [".mp3", ".wav", ".m4a", ".aac", ".flac", ".ogg"];
+    const tracks = [];
+
+    for (const file of files) {
+      const ext = path.extname(file).toLowerCase();
+      if (audioExtensions.includes(ext)) {
+        const trackTitle = path.basename(file, path.extname(file));
+        tracks.push({
+          title: trackTitle,
+          artist: title,
+          audioUrl: `/songs/${encodeURIComponent(folder)}/${encodeURIComponent(file)}`
+        });
+      }
+    }
+
+    if (tracks.length > 0) {
+      playlists.push({
+        id: `local-${folder}`,
+        title: title,
+        description: description,
+        cover: cover,
+        embedUrl: null,
+        tracks: tracks
+      });
+    }
+  }
+
+  return playlists;
 }
 
 async function getAccessToken() {
@@ -99,12 +169,18 @@ const server = http.createServer(async (req, res) => {
   }
 
   const url = new URL(req.url, `http://${req.headers.host}`);
-  const path = url.pathname;
+  const pathname = url.pathname;
 
-  const albumMatch = path.match(/^\/api\/albums\/([^/]+)$/);
-  const tracksMatch = path.match(/^\/api\/albums\/([^/]+)\/tracks$/);
+  const albumMatch = pathname.match(/^\/api\/albums\/([^/]+)$/);
+  const tracksMatch = pathname.match(/^\/api\/albums\/([^/]+)\/tracks$/);
 
   try {
+    if (pathname === "/api/local/playlists") {
+      const playlists = getLocalPlaylists();
+      sendJson(res, 200, { items: playlists });
+      return;
+    }
+
     if (albumMatch) {
       const albumId = albumMatch[1];
       const market = url.searchParams.get("market") || "ES";
@@ -120,6 +196,44 @@ const server = http.createServer(async (req, res) => {
       const offset = url.searchParams.get("offset") || "0";
       const endpoint = `https://api.spotify.com/v1/albums/${albumId}/tracks?market=${market}&limit=${limit}&offset=${offset}`;
       await proxySpotify(res, endpoint);
+      return;
+    }
+
+    if (pathname.startsWith("/api/")) {
+      sendError(res, 404, "API Route not found.");
+      return;
+    }
+
+    let filePath = pathname === "/" ? "/index.html" : decodeURIComponent(pathname);
+    let absPath = path.join(__dirname, filePath);
+
+    if (fs.existsSync(absPath) && fs.statSync(absPath).isDirectory()) {
+      absPath = path.join(absPath, "index.html");
+    }
+
+    if (fs.existsSync(absPath) && fs.statSync(absPath).isFile()) {
+      const ext = path.extname(absPath).toLowerCase();
+      const mimeTypes = {
+        ".html": "text/html",
+        ".js": "application/javascript",
+        ".css": "text/css",
+        ".json": "application/json",
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".svg": "image/svg+xml",
+        ".ico": "image/x-icon",
+        ".mp3": "audio/mpeg",
+        ".wav": "audio/wav",
+        ".m4a": "audio/mp4"
+      };
+      const contentType = mimeTypes[ext] || "application/octet-stream";
+      res.writeHead(200, {
+        "Content-Type": contentType,
+        "Access-Control-Allow-Origin": "*"
+      });
+      const readStream = fs.createReadStream(absPath);
+      readStream.pipe(res);
       return;
     }
 

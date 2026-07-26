@@ -78,6 +78,90 @@ async function fetchAlbumPlaylist(config) {
     };
 }
 
+async function loadLocalPlaylists() {
+    try {
+        const response = await fetch(`${API_BASE}/local/playlists`);
+        if (response.ok) {
+            const data = await response.json();
+            if (data && Array.isArray(data.items) && data.items.length > 0) {
+                return data.items;
+            }
+        }
+    } catch (error) {
+        console.warn("Could not load local playlists from server API, using standalone client fallback:", error.message);
+    }
+
+    return [
+        {
+            id: "local-ARJIT-SINGH",
+            title: "Arjit Singh PlayList",
+            description: "This the beautiful beats",
+            cover: "/songs/ARJIT%20SINGH/cover.jpeg",
+            embedUrl: null,
+            tracks: [
+                { title: "Tainu Khabar Nahi", artist: "Arjit Singh PlayList", audioUrl: "/songs/ARJIT%20SINGH/Tainu%20Khabar%20Nahi.mp3" }
+            ]
+        },
+        {
+            id: "local-GLORY",
+            title: "Glory Playlist",
+            description: "This is by Honey Singh",
+            cover: "/songs/GLORY/cover.jpeg",
+            embedUrl: null,
+            tracks: [
+                { title: "Chhori", artist: "Glory Playlist", audioUrl: "/songs/GLORY/Chhori.mp3" },
+                { title: "HIGH ON ME", artist: "Glory Playlist", audioUrl: "/songs/GLORY/HIGH%20ON%20ME.mp3" },
+                { title: "Jatt Mehkma", artist: "Glory Playlist", audioUrl: "/songs/GLORY/Jatt%20Mehkma.mp3" },
+                { title: "Millionaire", artist: "Glory Playlist", audioUrl: "/songs/GLORY/Millionaire.mp3" }
+            ]
+        },
+        {
+            id: "local-KK",
+            title: "KK Songs",
+            description: "KK Songs by KK",
+            cover: "/songs/KK/cover.jpeg",
+            embedUrl: null,
+            tracks: [
+                { title: "Aankhon Mein Teri Ajab Si", artist: "KK Songs", audioUrl: "/songs/KK/Aankhon%20Mein%20Teri%20Ajab%20Si.mp3" },
+                { title: "Beete Lamhe", artist: "KK Songs", audioUrl: "/songs/KK/Beete%20Lamhe.mp3" },
+                { title: "Dil Ibaadat Kar Raha Hai", artist: "KK Songs", audioUrl: "/songs/KK/Dil%20Ibaadat%20Kar%20Raha%20Hai.mp3" },
+                { title: "Dilnashin Dilnashin", artist: "KK Songs", audioUrl: "/songs/KK/Dilnashin%20Dilnashin.mp3" },
+                { title: "HAAN TU HAIN", artist: "KK Songs", audioUrl: "/songs/KK/HAAN%20TU%20HAIN.mp3" },
+                { title: "KHUDA JAANE", artist: "KK Songs", audioUrl: "/songs/KK/KHUDA%20JAANE.mp3" },
+                { title: "Labon Ko Bhool Bhulaiyaa", artist: "KK Songs", audioUrl: "/songs/KK/Labon%20Ko%20Bhool%20Bhulaiyaa.mp3" },
+                { title: "Tu Hi Haqeeqat", artist: "KK Songs", audioUrl: "/songs/KK/Tu%20Hi%20Haqeeqat.mp3" },
+                { title: "Tu Hi Meri Shab Hai", artist: "KK Songs", audioUrl: "/songs/KK/Tu%20Hi%20Meri%20Shab%20Hai.mp3" },
+                { title: "Tujhe Sochta Hoon", artist: "KK Songs", audioUrl: "/songs/KK/Tujhe%20Sochta%20Hoon.mp3" },
+                { title: "Tum Mile Audio", artist: "KK Songs", audioUrl: "/songs/KK/Tum%20Mile%20Audio.mp3" },
+                { title: "Zara Sa", artist: "KK Songs", audioUrl: "/songs/KK/Zara%20Sa.mp3" },
+                { title: "Zindagi Do Pal Ki", artist: "KK Songs", audioUrl: "/songs/KK/Zindagi%20Do%20Pal%20Ki.mp3" }
+            ]
+        },
+        {
+            id: "local-RADHA-KRISHANA",
+            title: "Radha Krishna Songs",
+            description: "This is Bhakti Songs",
+            cover: "/songs/RADHA%20KRISHANA/cover.jpeg",
+            embedUrl: null,
+            tracks: [
+                { title: "Choti Si Kishori", artist: "Radha Krishna Songs", audioUrl: "/songs/RADHA%20KRISHANA/Choti%20Si%20Kishori.mp3" },
+                { title: "Kishori Kuch Aisa Intezaam Ho Jaaye 2.0 ", artist: "Radha Krishna Songs", audioUrl: "/songs/RADHA%20KRISHANA/Kishori%20Kuch%20Aisa%20Intezaam%20Ho%20Jaaye%202.0%20.mp3" },
+                { title: "Main Radha Vallabh Ki ", artist: "Radha Krishna Songs", audioUrl: "/songs/RADHA%20KRISHANA/Main%20Radha%20Vallabh%20Ki%20.mp3" },
+                { title: "RADHA RANI LAGE", artist: "Radha Krishna Songs", audioUrl: "/songs/RADHA%20KRISHANA/RADHA%20RANI%20LAGE.mp3" },
+                { title: "Radha Krishna Song", artist: "Radha Krishna Songs", audioUrl: "/songs/RADHA%20KRISHANA/Radha%20Krishna%20Song.mp3" },
+                { title: "Radhe Braj Jan Man Sukhkari", artist: "Radha Krishna Songs", audioUrl: "/songs/RADHA%20KRISHANA/Radhe%20Braj%20Jan%20Man%20Sukhkari.mp3" },
+                { title: "Shyama Aan Baso", artist: "Radha Krishna Songs", audioUrl: "/songs/RADHA%20KRISHANA/Shyama%20Aan%20Baso.mp3" },
+                { title: "Suno Krishna Pyaare  by- Swati Mishra", artist: "Radha Krishna Songs", audioUrl: "/songs/RADHA%20KRISHANA/Suno%20Krishna%20Pyaare%20%20by-%20Swati%20Mishra.mp3" },
+                { title: "Tum Prem Ho", artist: "Radha Krishna Songs", audioUrl: "/songs/RADHA%20KRISHANA/Tum%20Prem%20Ho.mp3" },
+                { title: "Vrindavan Jaungi", artist: "Radha Krishna Songs", audioUrl: "/songs/RADHA%20KRISHANA/Vrindavan%20Jaungi.mp3" },
+                { title: "Vrindavan Mein Hukum Chale Barsane Wali Ka", artist: "Radha Krishna Songs", audioUrl: "/songs/RADHA%20KRISHANA/Vrindavan%20Mein%20Hukum%20Chale%20Barsane%20Wali%20Ka.mp3" },
+                { title: "kishori kuch aisa intjam ho jaye", artist: "Radha Krishna Songs", audioUrl: "/songs/RADHA%20KRISHANA/kishori%20kuch%20aisa%20intjam%20ho%20jaye.mp3" },
+                { title: "meri vinti yahi hai radha rani", artist: "Radha Krishna Songs", audioUrl: "/songs/RADHA%20KRISHANA/meri%20vinti%20yahi%20hai%20radha%20rani.mp3" }
+            ]
+        }
+    ];
+}
+
 async function loadPlaylists() {
     try {
         const results = await Promise.allSettled(
@@ -90,6 +174,11 @@ async function loadPlaylists() {
     } catch (error) {
         console.error("Playlist load failed:", error);
         state.playlists = [];
+    }
+
+    if (!state.playlists || state.playlists.length === 0) {
+        console.log("API playlists unavailable or empty. Loading fallback local songs...");
+        state.playlists = await loadLocalPlaylists();
     }
 }
 
@@ -229,6 +318,10 @@ async function main() {
 
     await loadPlaylists();
     renderPlaylists();
+
+    if (state.playlists && state.playlists.length > 0) {
+        loadPlaylist(state.playlists[0].id);
+    }
 
     const cardContainer = document.querySelector(".card-container");
     cardContainer.addEventListener("click", event => {
